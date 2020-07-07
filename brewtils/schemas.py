@@ -40,7 +40,7 @@ def _serialize_model(_, obj, type_field=None, allowed_types=None):
     model_type = getattr(obj, type_field)
 
     if model_type not in model_schema_map or (
-        allowed_types and model_type not in allowed_types
+            allowed_types and model_type not in allowed_types
     ):
         raise TypeError("Invalid model type %s" % model_type)
 
@@ -49,7 +49,7 @@ def _serialize_model(_, obj, type_field=None, allowed_types=None):
 
 def _deserialize_model(_, data, type_field=None, allowed_types=None):
     if data[type_field] not in model_schema_map or (
-        allowed_types and data[type_field] not in allowed_types
+            allowed_types and data[type_field] not in allowed_types
     ):
         raise TypeError("Invalid payload type %s" % data[type_field])
 
@@ -145,6 +145,10 @@ class ChoicesSchema(BaseSchema):
     strict = fields.Bool(allow_none=True, default=False)
     details = fields.Dict(allow_none=True)
 
+    # SQL Only
+    id = fields.Str(allow_none=True)
+    # parameter_id = fields.Int(allow_none=True)
+
 
 class ParameterSchema(BaseSchema):
     key = fields.Str(allow_none=True)
@@ -163,6 +167,10 @@ class ParameterSchema(BaseSchema):
     form_input_type = fields.Str(allow_none=True)
     type_info = fields.Dict(allow_none=True)
 
+    # SQL Only
+    id = fields.Str(allow_none=True)
+    # parameter_id = fields.Int(allow_none=True)
+    # command_id = fields.Int(allow_none=True)
 
 class CommandSchema(BaseSchema):
     id = fields.Str(allow_none=True)
@@ -178,6 +186,9 @@ class CommandSchema(BaseSchema):
     hidden = fields.Boolean(allow_none=True)
     system = fields.Nested("SystemSchema", only=("id",), allow_none=True)
 
+    # SQL Only
+    # system_id = fields.Int(allow_none=True)
+
 
 class InstanceSchema(BaseSchema):
     id = fields.Str(allow_none=True)
@@ -189,6 +200,10 @@ class InstanceSchema(BaseSchema):
     queue_info = fields.Dict(allow_none=True)
     icon_name = fields.Str(allow_none=True)
     metadata = fields.Dict(allow_none=True)
+
+    # SQL Only
+    # system_id = fields.Int(allow_none=True)
+
 
 
 class SystemSchema(BaseSchema):
@@ -204,6 +219,9 @@ class SystemSchema(BaseSchema):
     metadata = fields.Dict(allow_none=True)
     namespace = fields.Str(allow_none=True)
     local = fields.Bool(allow_none=True)
+
+    # SQL Only
+    # garden_id = fields.Int(allow_none=True)
 
 
 class RequestFileSchema(BaseSchema):
@@ -225,6 +243,9 @@ class RequestTemplateSchema(BaseSchema):
     metadata = fields.Dict(allow_none=True)
     output_type = fields.Str(allow_none=True)
 
+    # SQL Only
+    # job_id = fields.Int(allow_none=True)
+
 
 class RequestSchema(RequestTemplateSchema):
     id = fields.Str(allow_none=True)
@@ -240,9 +261,16 @@ class RequestSchema(RequestTemplateSchema):
     has_parent = fields.Bool(allow_none=True)
     requester = fields.String(allow_none=True)
 
+    # SQL Only
+    # parent_id = fields.Int(allow_none=True)
 
 class StatusInfoSchema(BaseSchema):
     heartbeat = DateTime(allow_none=True, format="epoch", example="1500065932000")
+
+    # SQL
+    id = fields.Str(allow_none=True)
+    # instance_id = fields.Int(allow_none=True)
+    # garden_id = fields.Int(allow_none=True)
 
 
 class PatchSchema(BaseSchema):
@@ -288,7 +316,6 @@ class LoggingConfigSchema(BaseSchema):
 
 
 class EventSchema(BaseSchema):
-
     name = fields.Str(allow_none=True)
     namespace = fields.Str(allow_none=True)
     garden = fields.Str(allow_none=True)
@@ -327,6 +354,10 @@ class RoleSchema(BaseSchema):
     description = fields.Str(allow_none=True)
     roles = fields.Nested("self", many=True, allow_none=True)
     permissions = fields.List(fields.Str(), allow_none=True)
+
+    # SQL Only
+    # role_id = fields.Int(allow_none=True)
+    # principal_id = fields.Int(allow_none=True)
 
 
 class RefreshTokenSchema(BaseSchema):
