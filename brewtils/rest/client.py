@@ -147,22 +147,27 @@ class RestClient(object):
         self.version_url = self.base_url + "version"
         self.config_url = self.base_url + "config"
 
+        self.system_url = self.base_url + "api/v1/systems/"
+        self.command_url = self.base_url + "api/v1/commands/"
+        self.request_url = self.base_url + "api/v1/requests/"
+        self.queue_url = self.base_url + "api/v1/queues/"
+        self.logging_url = self.base_url + "api/v1/logging/"
+        self.job_url = self.base_url + "api/v1/jobs/"
+        self.token_url = self.base_url + "api/v1/tokens/"
+        self.user_url = self.base_url + "api/v1/users/"
+
+        # Deprecated
+        self.logging_config_url = self.base_url + "api/v1/config/logging/"
+
+        self.event_url = self.base_url + "api/vbeta/events/"
+        self.file_url = self.base_url + "api/vbeta/files/"
+
         if self.api_version == 1:
-            self.system_url = self.base_url + "api/v1/systems/"
-            self.instance_url = self.base_url + "api/v1/instances/"
-            self.command_url = self.base_url + "api/v1/commands/"
-            self.request_url = self.base_url + "api/v1/requests/"
-            self.queue_url = self.base_url + "api/v1/queues/"
-            self.logging_url = self.base_url + "api/v1/logging/"
-            self.job_url = self.base_url + "api/v1/jobs/"
-            self.token_url = self.base_url + "api/v1/tokens/"
-            self.user_url = self.base_url + "api/v1/users/"
-
-            # Deprecated
-            self.logging_config_url = self.base_url + "api/v1/config/logging/"
-
-            self.event_url = self.base_url + "api/vbeta/events/"
-            self.file_url = self.base_url + "api/vbeta/files/"
+            self.instance_url = self.base_url + "api/v1/instances/{instance_id}"
+        elif self.api_version == 2:
+            self.instance_url = (
+                self.base_url + "api/v2/systems/{system_id}/instances/{instance_name}/"
+            )
         else:
             raise ValueError("Invalid Beer-garden API version: %s" % self.api_version)
 
@@ -351,48 +356,72 @@ class RestClient(object):
         return self.session.delete(self.system_url + system_id)
 
     @enable_auth
-    def get_instance(self, instance_id):
-        # type: (str) -> Response
+    def get_instance(self, instance_id=None, system_id=None, instance_name=None):
+        # type: (str, str, str) -> Response
         """Performs a GET on the Instance URL
 
         Args:
-            instance_id: Instance ID
+            instance_id: Instance ID (v1)
+            system_id: System ID (v2)
+            instance_name: Instance name (v2)
 
         Returns:
             Requests Response object
         """
-        return self.session.get(self.instance_url + instance_id)
+        return self.session.get(
+            self.instance_url.format(
+                instance_id=instance_id,
+                system_id=system_id,
+                instance_name=instance_name,
+            )
+        )
 
     @enable_auth
-    def patch_instance(self, instance_id, payload):
-        # type: (str, str) -> Response
+    def patch_instance(
+        self, instance_id=None, system_id=None, instance_name=None, payload=None
+    ):
+        # type: (str, str, str, str) -> Response
         """Performs a PATCH on the instance URL
 
         Args:
-            instance_id: Instance ID
+            instance_id: Instance ID (v1)
+            system_id: System ID (v2)
+            instance_name: Instance name (v2)
             payload: Serialized PatchOperation
 
         Returns:
             Requests Response object
         """
         return self.session.patch(
-            self.instance_url + str(instance_id),
+            self.instance_url.format(
+                instance_id=instance_id,
+                system_id=system_id,
+                instance_name=instance_name,
+            ),
             data=payload,
             headers=self.JSON_HEADERS,
         )
 
     @enable_auth
-    def delete_instance(self, instance_id):
-        # type: (str) -> Response
+    def delete_instance(self, instance_id=None, system_id=None, instance_name=None):
+        # type: (str, str, str) -> Response
         """Performs a DELETE on an Instance URL
 
         Args:
-            instance_id: Instance ID
+            instance_id: Instance ID (v1)
+            system_id: System ID (v2)
+            instance_name: Instance name (v2)
 
         Returns:
             Requests Response object
         """
-        return self.session.delete(self.instance_url + instance_id)
+        return self.session.delete(
+            self.instance_url.format(
+                instance_id=instance_id,
+                system_id=system_id,
+                instance_name=instance_name,
+            )
+        )
 
     @enable_auth
     def get_commands(self):

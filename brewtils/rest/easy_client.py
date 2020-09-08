@@ -17,7 +17,7 @@ from brewtils.errors import (
     WaitExceededError,
     _deprecate,
 )
-from brewtils.models import Event, PatchOperation
+from brewtils.models import Event, Instance, PatchOperation
 from brewtils.rest.client import RestClient
 from brewtils.schema_parser import SchemaParser
 
@@ -356,11 +356,15 @@ class EasyClient(object):
     @wrap_response(
         parse_method="parse_instance", parse_many=False, default_exc=SaveError
     )
-    def initialize_instance(self, instance_id, runner_id=None):
+    def initialize_instance(
+        self, instance_id=None, system_id=None, instance_name=None, runner_id=None
+    ):
         """Start an Instance
 
         Args:
-            instance_id (str): The Instance ID
+            instance_id (str): Instance ID (v1)
+            system_id (str): System ID (v2)
+            instance_name (str): Instance name (v2)
             runner_id (str): The PluginRunner ID, if any
 
         Returns:
@@ -368,8 +372,10 @@ class EasyClient(object):
 
         """
         return self.client.patch_instance(
-            instance_id,
-            SchemaParser.serialize_patch(
+            instance_id=instance_id,
+            system_id=system_id,
+            instance_name=instance_name,
+            payload=SchemaParser.serialize_patch(
                 PatchOperation(operation="initialize", value={"runner_id": runner_id})
             ),
         )
@@ -377,26 +383,34 @@ class EasyClient(object):
     @wrap_response(
         parse_method="parse_instance", parse_many=False, default_exc=FetchError
     )
-    def get_instance(self, instance_id):
+    def get_instance(self, instance_id=None, system_id=None, instance_name=None):
         """Get an Instance
 
         Args:
-            instance_id: The Id
+            instance_id (str): Instance ID (v1)
+            system_id (str): System ID (v2)
+            instance_name (str): Instance name (v2)
 
         Returns:
             The Instance
 
         """
-        return self.client.get_instance(instance_id)
+        return self.client.get_instance(
+            instance_id=instance_id, system_id=system_id, instance_name=instance_name
+        )
 
     @wrap_response(
         parse_method="parse_instance", parse_many=False, default_exc=SaveError
     )
-    def update_instance(self, instance_id, **kwargs):
+    def update_instance(
+        self, instance_id=None, system_id=None, instance_name=None, **kwargs
+    ):
         """Update an Instance status
 
         Args:
-            instance_id (str): The Instance ID
+            instance_id (str): Instance ID (v1)
+            system_id (str): System ID (v2)
+            instance_name (str): Instance name (v2)
 
         Keyword Args:
             new_status (str): The new status
@@ -417,7 +431,10 @@ class EasyClient(object):
             operations.append(PatchOperation("update", "/metadata", metadata))
 
         return self.client.patch_instance(
-            instance_id, SchemaParser.serialize_patch(operations, many=True)
+            instance_id=instance_id,
+            system_id=system_id,
+            instance_name=instance_name,
+            payload=SchemaParser.serialize_patch(operations, many=True),
         )
 
     def get_instance_status(self, instance_id):
@@ -435,7 +452,7 @@ class EasyClient(object):
             "Please use get_instance() instead."
         )
 
-        return self.get_instance(instance_id).status
+        return self.get_instance(instance_id=instance_id).status
 
     def update_instance_status(self, instance_id, new_status):
         """Update an Instance status
@@ -456,35 +473,41 @@ class EasyClient(object):
         return self.update_instance(instance_id, new_status=new_status)
 
     @wrap_response(return_boolean=True, default_exc=SaveError)
-    def instance_heartbeat(self, instance_id):
+    def instance_heartbeat(self, instance_id=None, system_id=None, instance_name=None):
         """Send an Instance heartbeat
 
         Args:
-            instance_id (str): The Instance ID
+            instance_id (str): Instance ID (v1)
+            system_id (str): System ID (v2)
+            instance_name (str): Instance name (v2)
 
         Returns:
             bool: True if the heartbeat was successful
 
         """
         return self.client.patch_instance(
-            instance_id, SchemaParser.serialize_patch(PatchOperation("heartbeat"))
+            instance_id=instance_id,
+            system_id=system_id,
+            instance_name=instance_name,
+            payload=SchemaParser.serialize_patch(PatchOperation("heartbeat")),
         )
 
     @wrap_response(return_boolean=True, default_exc=DeleteError)
-    def remove_instance(self, instance_id):
+    def remove_instance(self, instance_id=None, system_id=None, instance_name=None):
         """Remove an Instance
 
         Args:
-            instance_id (str): The Instance ID
+            instance_id (str): Instance ID (v1)
+            system_id (str): System ID (v2)
+            instance_name (str): Instance name (v2)
 
         Returns:
             bool: True if the remove was successful
 
         """
-        if instance_id is None:
-            raise DeleteError("Cannot delete an instance without an id")
-
-        return self.client.delete_instance(instance_id)
+        return self.client.delete_instance(
+            instance_id=instance_id, system_id=system_id, instance_name=instance_name
+        )
 
     @wrap_response(
         parse_method="parse_request", parse_many=False, default_exc=FetchError

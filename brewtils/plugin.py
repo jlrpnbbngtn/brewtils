@@ -325,7 +325,11 @@ class Plugin(object):
         self._admin_processor.shutdown()
 
         try:
-            self._ez_client.update_instance(self._instance.id, new_status="STOPPED")
+            self._ez_client.update_instance(
+                system_id=self._system.id,
+                instance_name=self._instance.name,
+                new_status="STOPPED",
+            )
         except Exception:
             self._logger.warning(
                 "Unable to notify Beer-garden that this plugin is STOPPED, so this "
@@ -448,7 +452,8 @@ class Plugin(object):
             )
 
         return self._ez_client.initialize_instance(
-            self._system.get_instance_by_name(self._config.instance_name).id,
+            system_id=self._system.id,
+            instance_name=self._config.instance_name,
             runner_id=self._config.runner_id,
         )
 
@@ -512,7 +517,9 @@ class Plugin(object):
     def _start(self):
         """Handle start Request"""
         self._instance = self._ez_client.update_instance(
-            self._instance.id, new_status="RUNNING"
+            system_id=self._system.id,
+            instance_name=self._instance.name,
+            new_status="RUNNING",
         )
 
     def _stop(self):
@@ -528,7 +535,9 @@ class Plugin(object):
     def _status(self):
         """Handle status Request"""
         try:
-            self._ez_client.instance_heartbeat(self._instance.id)
+            self._ez_client.instance_heartbeat(
+                system_id=self._system.id, instance_name=self._instance.name
+            )
         except (RequestsConnectionError, RestConnectionError):
             pass
 
