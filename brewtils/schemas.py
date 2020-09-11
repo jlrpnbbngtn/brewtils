@@ -169,7 +169,7 @@ class CommandSchema(BaseSchema):
     description = fields.Str(allow_none=True)
     parameters = fields.Nested("ParameterSchema", many=True)
     command_type = fields.Str(allow_none=True)
-    output_type = fields.Str(allow_none=True)
+    output_type = fields.List(fields.Str(), allow_none=True)
     schema = fields.Dict(allow_none=True)
     form = fields.Dict(allow_none=True)
     template = fields.Str(allow_none=True)

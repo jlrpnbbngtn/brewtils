@@ -135,12 +135,16 @@ def command(
 
     generated_command = _generate_command_from_function(_wrapped)
     generated_command.command_type = command_type
-    generated_command.output_type = output_type
     generated_command.hidden = hidden
     generated_command.icon_name = icon_name
 
     if description:
         generated_command.description = description
+
+    if isinstance(output_type, list):
+        generated_command.output_type = output_type
+    else:
+        generated_command.output_type = [output_type]
 
     resolved_mod = _resolve_display_modifiers(
         _wrapped, generated_command.name, schema=schema, form=form, template=template

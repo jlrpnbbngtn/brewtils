@@ -516,7 +516,7 @@ class TestCommand(object):
         assert cmd._command.command_type == "INFO"
         assert cmd._command.description == "desc2"
         assert cmd._command.hidden is False
-        assert cmd._command.output_type == "JSON"
+        assert cmd._command.output_type == ["JSON"]
 
     def test_generate_command_python2(self, func_mock):
         # Apparently Python 2 adds some extra stuff
@@ -546,14 +546,13 @@ class TestCommand(object):
 class TestDecoratorCombinations(object):
     def test_command_then_parameter(self, cmd, param_definition):
         @parameter(**param_definition)
-        @command(command_type="INFO", output_type="JSON")
+        @command(command_type="INFO")
         def _cmd(_, foo):
             return foo
 
         assert hasattr(_cmd, "_command")
         assert _cmd._command.name == "_cmd"
         assert _cmd._command.command_type == "INFO"
-        assert _cmd._command.output_type == "JSON"
         assert len(_cmd._command.parameters) == 1
 
         assert_parameter_equal(
@@ -561,7 +560,7 @@ class TestDecoratorCombinations(object):
         )
 
     def test_parameter_then_command(self, cmd, param_definition):
-        @command(command_type="INFO", output_type="JSON")
+        @command(command_type="INFO")
         @parameter(**param_definition)
         def _cmd(_, foo):
             return foo
@@ -569,7 +568,6 @@ class TestDecoratorCombinations(object):
         assert hasattr(_cmd, "_command")
         assert _cmd._command.name == "_cmd"
         assert _cmd._command.command_type == "INFO"
-        assert _cmd._command.output_type == "JSON"
         assert len(_cmd._command.parameters) == 1
 
         assert_parameter_equal(

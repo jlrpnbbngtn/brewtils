@@ -161,7 +161,7 @@ def command_dict(parameter_dict, system_id):
         "description": "desc",
         "parameters": [parameter_dict],
         "command_type": "ACTION",
-        "output_type": "STRING",
+        "output_type": ["JSON", "STRING"],
         "hidden": False,
         "schema": {},
         "form": {},
