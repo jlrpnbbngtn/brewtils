@@ -25,10 +25,13 @@ choices_grammar = r"""
     url_args: "?" arg_pair ("&" arg_pair)*
 
     arg_pair: CNAME "=" ref
-    ?ref: "${" CNAME "}"
+    ?ref: "${" REFERENT "}"
 
     ADDRESS: /^http[^\?]*/
+    REFERENT: ("_"|LETTER) ("_"|"."|LETTER|DIGIT)*
 
+    %import common.LETTER
+    %import common.DIGIT
     %import common.CNAME
     %import common.WS
     %ignore WS

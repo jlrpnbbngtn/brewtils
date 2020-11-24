@@ -17,6 +17,7 @@ class TestChoices(object):
             ("f", {"name": "f", "args": []}),
             ("f()", {"name": "f", "args": []}),
             ("f(single=${arg})", {"name": "f", "args": [("single", "arg")]}),
+            ("f(single=${arg.nest})", {"name": "f", "args": [("single", "arg.nest")]}),
             (
                 "f(single=${arg}, another=${arg})",
                 {"name": "f", "args": [("single", "arg"), ("another", "arg")]},
